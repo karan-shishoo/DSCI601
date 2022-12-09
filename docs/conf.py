@@ -10,10 +10,14 @@ project = 'Applying Contextual Multi-Armed Bandits to improve self-adaptive MAPE
 copyright = '2022, Karan Shishoo'
 author = 'Karan Shishoo'
 
+import os
+import sys
+sys.path.insert(0, os.path.abspath('..'))
+
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
 
-extensions = ['nbsphinx']
+extensions = ['nbsphinx', 'sphinx.ext.autodoc', 'sphinx.ext.coverage']
 
 templates_path = ['_templates']
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
