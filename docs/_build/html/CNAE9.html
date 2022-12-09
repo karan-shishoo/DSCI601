@@ -1,0 +1,878 @@
+
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.19: https://docutils.sourceforge.io/" />
+
+    <title>Imports &#8212; Applying Contextual Multi-Armed Bandits to improve self-adaptive MAPE-K loops  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css" />
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/_sphinx_javascript_frameworks_compat.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/sphinx_highlight.js"></script>
+    <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+    <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to Applying CMAB to improve MAPE-K loops’s documentation!" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt *,
+div.nbinput.container div.input_area pre,
+div.nboutput.container div.output_area pre,
+div.nbinput.container div.input_area .highlight,
+div.nboutput.container div.output_area .highlight {
+    border: none;
+    padding: 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+div.nbinput.container > div[class*=highlight],
+div.nboutput.container > div[class*=highlight] {
+    margin: 0;
+}
+
+div.nbinput.container div.prompt *,
+div.nboutput.container div.prompt * {
+    background: none;
+}
+
+div.nboutput.container div.output_area .highlight,
+div.nboutput.container div.output_area pre {
+    background: unset;
+}
+
+div.nboutput.container div.output_area div.highlight {
+    color: unset;  /* override Pygments text color */
+}
+
+/* avoid gaps between output lines */
+div.nboutput.container div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput.container,
+div.nboutput.container {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput.container,
+    div.nboutput.container {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput.container {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast.container {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput.container div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput.container div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput.container div.prompt,
+div.nboutput.container div.prompt {
+    width: 4.5ex;
+    padding-top: 5px;
+    position: relative;
+    user-select: none;
+}
+
+div.nbinput.container div.prompt > div,
+div.nboutput.container div.prompt > div {
+    position: absolute;
+    right: 0;
+    margin-right: 0.3ex;
+}
+
+@media (max-width: 540px) {
+    div.nbinput.container div.prompt,
+    div.nboutput.container div.prompt {
+        width: unset;
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput.container div.prompt.empty {
+        padding: 0;
+    }
+
+    div.nbinput.container div.prompt > div,
+    div.nboutput.container div.prompt > div {
+        position: unset;
+    }
+}
+
+/* disable scrollbars and line breaks on prompts */
+div.nbinput.container div.prompt pre,
+div.nboutput.container div.prompt pre {
+    overflow: hidden;
+    white-space: pre;
+}
+
+/* input/output area */
+div.nbinput.container div.input_area,
+div.nboutput.container div.output_area {
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput.container div.input_area,
+    div.nboutput.container div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput.container div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    /*background: #f5f5f5;*/
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput.container div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput.container div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput.container div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+
+div.nbinput.container div.input_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight] > pre,
+div.nboutput.container div.output_area div[class*=highlight].math,
+div.nboutput.container div.output_area.rendered_html,
+div.nboutput.container div.output_area > div.output_javascript,
+div.nboutput.container div.output_area:not(.rendered_html) > img{
+    padding: 5px;
+    margin: 0;
+}
+
+/* fix copybtn overflow problem in chromium (needed for 'sphinx_copybutton') */
+div.nbinput.container div.input_area > div[class^='highlight'],
+div.nboutput.container div.output_area > div[class^='highlight']{
+    overflow-y: hidden;
+}
+
+/* hide copybtn icon on prompts (needed for 'sphinx_copybutton') */
+.prompt .copybtn {
+    display: none;
+}
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+.jp-RenderedHTMLCommon table,
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+.jp-RenderedHTMLCommon thead,
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+.jp-RenderedHTMLCommon tr,
+.jp-RenderedHTMLCommon th,
+.jp-RenderedHTMLCommon td,
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+.jp-RenderedHTMLCommon th,
+div.rendered_html th {
+  font-weight: bold;
+}
+.jp-RenderedHTMLCommon tbody tr:nth-child(odd),
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+.jp-RenderedHTMLCommon tbody tr:hover,
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+</style>
+<section id="Imports">
+<h1>Imports<a class="headerlink" href="#Imports" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span><span class="o">,</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span><span class="o">,</span> <span class="nn">re</span>
+<span class="kn">from</span> <span class="nn">sklearn.preprocessing</span> <span class="kn">import</span> <span class="n">MultiLabelBinarizer</span>
+
+<span class="c1">## Sk learn imports</span>
+<span class="kn">from</span> <span class="nn">sklearn.linear_model</span> <span class="kn">import</span> <span class="n">LogisticRegression</span><span class="p">,</span> <span class="n">Ridge</span>
+
+<span class="c1">## contextualbandit package</span>
+<span class="kn">from</span> <span class="nn">contextualbandits.online</span> <span class="kn">import</span> <span class="n">SeparateClassifiers</span>
+<span class="kn">from</span> <span class="nn">contextualbandits.offpolicy</span> <span class="kn">import</span> <span class="n">OffsetTree</span>
+<span class="kn">from</span> <span class="nn">contextualbandits.offpolicy</span> <span class="kn">import</span> <span class="n">DoublyRobustEstimator</span>
+
+<span class="c1">## Plotting</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span><span class="o">,</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+<span class="kn">import</span> <span class="nn">seaborn</span> <span class="k">as</span> <span class="nn">sns</span>
+
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">math</span>
+
+
+<span class="kn">from</span> <span class="nn">matplotlib</span> <span class="kn">import</span> <span class="n">pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="n">ylim</span>
+<span class="kn">from</span> <span class="nn">matplotlib.pyplot</span> <span class="kn">import</span> <span class="n">figure</span>
+
+<span class="o">%</span><span class="k">matplotlib</span> inline
+<span class="kn">import</span> <span class="nn">mmap</span>
+</pre></div>
+</div>
+</div>
+</section>
+<section id="Initial-data-processing">
+<h1>Initial data processing<a class="headerlink" href="#Initial-data-processing" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">get_num_lines</span><span class="p">(</span><span class="n">file_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Gets the number of lines that exists in the file in the provided filepath</span>
+
+<span class="sd">    :param file_path: A string that provides the file path of the file that needs its lines counted.</span>
+<span class="sd">    :type file_path: string, required</span>
+
+<span class="sd">    :return: The number of lines in the file</span>
+<span class="sd">    :rtype: int</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">fp</span> <span class="o">=</span> <span class="nb">open</span><span class="p">(</span><span class="n">file_path</span><span class="p">,</span> <span class="s2">&quot;r+&quot;</span><span class="p">)</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">mmap</span><span class="o">.</span><span class="n">mmap</span><span class="p">(</span><span class="n">fp</span><span class="o">.</span><span class="n">fileno</span><span class="p">(),</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">while</span> <span class="n">buf</span><span class="o">.</span><span class="n">readline</span><span class="p">():</span>
+        <span class="n">lines</span> <span class="o">+=</span> <span class="mi">1</span>
+    <span class="k">return</span> <span class="n">lines</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">parse_data</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Extracts the features and predictions from the provided file</span>
+
+<span class="sd">    :param filename: A string that provides the file path of the file that needs its lines counted.</span>
+<span class="sd">    :type filename: string, required</span>
+
+<span class="sd">    :return: Tuple with the features and expected predictions of those features</span>
+<span class="sd">    :rtype: Tuple containing a list of lists and a list of ints</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">feature_list</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">preds</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="n">get_num_lines</span><span class="p">(</span><span class="n">filename</span><span class="p">)):</span>
+            <span class="n">line</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;ASCII&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;,&#39;</span><span class="p">)</span>
+            <span class="n">preds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">features</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">features</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+            <span class="n">feature_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">feature_list</span><span class="p">,</span> <span class="n">preds</span>
+
+<span class="n">features</span><span class="p">,</span> <span class="n">preds</span> <span class="o">=</span> <span class="n">parse_data</span><span class="p">(</span><span class="s2">&quot;datasets/CNAE-9.data&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+100%|████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████████| 1080/1080 [00:00&lt;00:00, 60044.12it/s]
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">clean_data</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">preds</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Cleans the provided features and predictions</span>
+
+<span class="sd">    :param features: A list of features</span>
+<span class="sd">    :type features: list, required</span>
+
+<span class="sd">    :param preds: A list of expected predictions</span>
+<span class="sd">    :type preds: list, required</span>
+
+<span class="sd">    :return: Tuple with the cleaned features and expected predictions of those features</span>
+<span class="sd">    :rtype: Tuple containing a numpy array of numpy arrays of ints and a numpy array  of ints</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mlb</span> <span class="o">=</span> <span class="n">MultiLabelBinarizer</span><span class="p">()</span>
+    <span class="n">preds_list</span> <span class="o">=</span> <span class="p">[[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">preds</span><span class="p">]</span>
+    <span class="n">preds_mlb</span> <span class="o">=</span> <span class="n">mlb</span><span class="o">.</span><span class="n">fit_transform</span><span class="p">(</span><span class="n">preds_list</span><span class="p">)</span>
+    <span class="n">features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">features</span><span class="p">)</span>
+
+    <span class="n">temp</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">preds_mlb</span><span class="p">))</span>
+    <span class="n">random</span><span class="o">.</span><span class="n">shuffle</span><span class="p">(</span><span class="n">temp</span><span class="p">)</span>
+    <span class="n">features</span><span class="p">,</span> <span class="n">preds_mlb</span> <span class="o">=</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">temp</span><span class="p">)</span>
+
+    <span class="n">features</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">features</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">int</span><span class="p">)</span>
+    <span class="n">preds_mlb</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">preds_mlb</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">features</span><span class="p">,</span> <span class="n">preds_mlb</span>
+
+<span class="n">features</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">clean_data</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">preds</span><span class="p">)</span>
+<br/></pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">get_num_lines</span><span class="p">(</span><span class="s2">&quot;datasets/CNAE-9.data&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+1080
+</pre></div></div>
+</div>
+</section>
+<section id="Comparison-of-various-CMAB-algorithms">
+<h1>Comparison of various CMAB algorithms<a class="headerlink" href="#Comparison-of-various-CMAB-algorithms" title="Permalink to this heading">¶</a></h1>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">CMAB_explore</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Explores the viablity of various CMAB algorithms using the provided features and predictions.</span>
+<span class="sd">       Once it is done exploring it plots out the results of the exploration in a graph for comparison</span>
+
+<span class="sd">    :param features: A numpy array of features</span>
+<span class="sd">    :type features: numpy array, required</span>
+
+<span class="sd">    :param y: A numpy array of expected predictions</span>
+<span class="sd">    :type y: numpy array, required</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1">## We can see that there are 1080 rows to  explore so we can split the data into an exploration set</span>
+    <span class="c1">## initial test set</span>
+    <span class="c1">## and then an off-policy set</span>
+
+    <span class="c1"># the &#39;explorer&#39; polcy will be fit with this small sample of the rows</span>
+    <span class="n">st_seed</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">end_seed</span> <span class="o">=</span> <span class="mi">200</span>
+
+    <span class="c1"># then it will choose actions for this larger sample</span>
+    <span class="n">st_exploration</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">end_exploration</span> <span class="o">=</span> <span class="mi">500</span>
+
+    <span class="c1"># the new policy will be evaluated with a separate test set</span>
+    <span class="n">st_test</span> <span class="o">=</span> <span class="mi">500</span>
+    <span class="n">end_test</span> <span class="o">=</span> <span class="mi">1080</span>
+
+    <span class="c1"># separating the covariates data for each case</span>
+    <span class="n">Xseed</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="n">st_seed</span><span class="p">:</span><span class="n">end_seed</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">Xexplore_sample</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="n">st_exploration</span><span class="p">:</span><span class="n">end_exploration</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">Xtest</span> <span class="o">=</span> <span class="n">features</span><span class="p">[</span><span class="n">st_test</span><span class="p">:</span><span class="n">end_test</span><span class="p">,</span> <span class="p">:]</span>
+    <span class="n">nchoices</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+    <span class="c1"># now constructing an exploration policy as explained above, with fully-labeled data</span>
+    <span class="n">explorer</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="s2">&quot;sag&quot;</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">15000</span><span class="p">)</span>
+    <span class="n">explorer</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">Xseed</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">st_seed</span><span class="p">:</span><span class="n">end_seed</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+
+    <span class="c1"># letting the exploration policy choose actions which will then be used new policy input</span>
+    <span class="n">actions_explore_sample</span> <span class="o">=</span> <span class="n">explorer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Xexplore_sample</span><span class="p">)</span>
+    <span class="n">rewards_explore_sample</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">st_exploration</span><span class="p">:</span><span class="n">end_exploration</span><span class="p">,</span> <span class="p">:]</span>\
+                            <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">end_exploration</span> <span class="o">-</span> <span class="n">st_exploration</span><span class="p">),</span> <span class="n">actions_explore_sample</span><span class="p">]</span>
+
+    <span class="c1"># extracting the probabilities it estimated</span>
+    <span class="n">ix_internal_actions</span> <span class="o">=</span> <span class="p">{</span><span class="n">j</span><span class="p">:</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">j</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">explorer</span><span class="o">.</span><span class="n">classes_</span><span class="p">)}</span>
+    <span class="n">ix_internal_actions</span> <span class="o">=</span> <span class="p">[</span><span class="n">ix_internal_actions</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">actions_explore_sample</span><span class="p">]</span>
+    <span class="n">ix_internal_actions</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">ix_internal_actions</span><span class="p">)</span>
+    <span class="n">prob_actions_explore</span> <span class="o">=</span> <span class="n">explorer</span><span class="o">.</span><span class="n">predict_proba</span><span class="p">(</span><span class="n">Xexplore_sample</span><span class="p">)[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">Xexplore_sample</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
+                                                                   <span class="n">ix_internal_actions</span><span class="p">]</span>
+
+
+    <span class="n">new_policy</span> <span class="o">=</span> <span class="n">SeparateClassifiers</span><span class="p">(</span><span class="n">base_algorithm</span><span class="o">=</span><span class="n">LogisticRegression</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="s2">&quot;sag&quot;</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">15000</span><span class="p">),</span>
+                                     <span class="n">nchoices</span><span class="o">=</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">beta_prior</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">smoothing</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+    <span class="n">new_policy</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">Xexplore_sample</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">actions_explore_sample</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">rewards_explore_sample</span><span class="p">)</span>
+    <span class="n">mean_reward_naive</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">st_test</span><span class="p">:</span><span class="n">end_test</span><span class="p">,</span> <span class="p">:]</span>\
+                                 <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">end_test</span> <span class="o">-</span> <span class="n">st_test</span><span class="p">),</span> <span class="n">new_policy</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Xtest</span><span class="p">)])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test set mean reward - Separate Classifiers: &quot;</span><span class="p">,</span> <span class="n">mean_reward_naive</span><span class="p">)</span>
+
+
+    <span class="n">new_policy</span> <span class="o">=</span> <span class="n">SeparateClassifiers</span><span class="p">(</span><span class="n">base_algorithm</span><span class="o">=</span><span class="n">LogisticRegression</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="s2">&quot;sag&quot;</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">15000</span><span class="p">),</span>
+                                     <span class="n">nchoices</span><span class="o">=</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">beta_prior</span><span class="o">=</span><span class="s2">&quot;auto&quot;</span><span class="p">)</span>
+    <span class="n">new_policy</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">Xexplore_sample</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">actions_explore_sample</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">rewards_explore_sample</span><span class="p">)</span>
+    <span class="n">mean_reward_beta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">st_test</span><span class="p">:</span><span class="n">end_test</span><span class="p">,</span> <span class="p">:]</span>\
+                                <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">end_test</span> <span class="o">-</span> <span class="n">st_test</span><span class="p">),</span> <span class="n">new_policy</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Xtest</span><span class="p">)])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test set mean reward - Separate Classifiers + Prior: &quot;</span><span class="p">,</span> <span class="n">mean_reward_beta</span><span class="p">)</span>
+
+
+    <span class="n">new_policy</span> <span class="o">=</span> <span class="n">SeparateClassifiers</span><span class="p">(</span><span class="n">base_algorithm</span><span class="o">=</span><span class="n">LogisticRegression</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="s2">&quot;sag&quot;</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">15000</span><span class="p">),</span>
+                                     <span class="n">nchoices</span><span class="o">=</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">beta_prior</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">smoothing</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">new_policy</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">Xexplore_sample</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">actions_explore_sample</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">rewards_explore_sample</span><span class="p">)</span>
+    <span class="n">mean_reward_sm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">st_test</span><span class="p">:</span><span class="n">end_test</span><span class="p">,</span> <span class="p">:]</span>\
+                                <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">end_test</span> <span class="o">-</span> <span class="n">st_test</span><span class="p">),</span> <span class="n">new_policy</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Xtest</span><span class="p">)])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test set mean reward - Separate Classifiers + Smoothing: &quot;</span><span class="p">,</span> <span class="n">mean_reward_sm</span><span class="p">)</span>
+
+
+    <span class="n">new_policy</span> <span class="o">=</span> <span class="n">OffsetTree</span><span class="p">(</span><span class="n">base_algorithm</span><span class="o">=</span><span class="n">LogisticRegression</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="s2">&quot;sag&quot;</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">15000</span><span class="p">),</span> <span class="n">nchoices</span><span class="o">=</span><span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+    <span class="n">new_policy</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">Xexplore_sample</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">actions_explore_sample</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">rewards_explore_sample</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">prob_actions_explore</span><span class="p">)</span>
+    <span class="n">mean_reward_ot</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">st_test</span><span class="p">:</span><span class="n">end_test</span><span class="p">,</span> <span class="p">:][</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">end_test</span> <span class="o">-</span> <span class="n">st_test</span><span class="p">),</span> <span class="n">new_policy</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Xtest</span><span class="p">)])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test set mean reward - Offset Tree technique: &quot;</span><span class="p">,</span> <span class="n">mean_reward_ot</span><span class="p">)</span>
+
+
+    <span class="n">new_policy</span> <span class="o">=</span> <span class="n">DoublyRobustEstimator</span><span class="p">(</span><span class="n">base_algorithm</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">(),</span>
+                                       <span class="n">reward_estimator</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="s2">&quot;sag&quot;</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">15000</span><span class="p">),</span>
+                                       <span class="n">nchoices</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                       <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;rovr&#39;</span><span class="p">,</span> <span class="n">beta_prior</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">smoothing</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">new_policy</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">Xexplore_sample</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">actions_explore_sample</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">rewards_explore_sample</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">prob_actions_explore</span><span class="p">)</span>
+    <span class="n">mean_reward_dr</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">st_test</span><span class="p">:</span><span class="n">end_test</span><span class="p">,</span> <span class="p">:][</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">end_test</span> <span class="o">-</span> <span class="n">st_test</span><span class="p">),</span> <span class="n">new_policy</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Xtest</span><span class="p">)])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test set mean reward - Doubly-Robust Estimator: &quot;</span><span class="p">,</span> <span class="n">mean_reward_dr</span><span class="p">)</span>
+
+
+    <span class="n">new_policy</span> <span class="o">=</span> <span class="n">DoublyRobustEstimator</span><span class="p">(</span><span class="n">base_algorithm</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">(),</span>
+                                       <span class="n">reward_estimator</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="s2">&quot;sag&quot;</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">15000</span><span class="p">),</span>
+                                       <span class="n">nchoices</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                       <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;rovr&#39;</span><span class="p">,</span> <span class="n">beta_prior</span> <span class="o">=</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span> <span class="n">smoothing</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">new_policy</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">Xexplore_sample</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">actions_explore_sample</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">rewards_explore_sample</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">prob_actions_explore</span><span class="p">)</span>
+    <span class="n">mean_reward_dr_prior</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">st_test</span><span class="p">:</span><span class="n">end_test</span><span class="p">,</span> <span class="p">:][</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">end_test</span> <span class="o">-</span> <span class="n">st_test</span><span class="p">),</span> <span class="n">new_policy</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Xtest</span><span class="p">)])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test set mean reward - Doubly-Robust Estimator + Prior: &quot;</span><span class="p">,</span> <span class="n">mean_reward_dr_prior</span><span class="p">)</span>
+
+    <span class="n">new_policy</span> <span class="o">=</span> <span class="n">DoublyRobustEstimator</span><span class="p">(</span><span class="n">base_algorithm</span> <span class="o">=</span> <span class="n">Ridge</span><span class="p">(),</span>
+                                       <span class="n">reward_estimator</span> <span class="o">=</span> <span class="n">LogisticRegression</span><span class="p">(</span><span class="n">solver</span><span class="o">=</span><span class="s2">&quot;sag&quot;</span><span class="p">,</span> <span class="n">max_iter</span><span class="o">=</span><span class="mi">15000</span><span class="p">),</span>
+                                       <span class="n">nchoices</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                                       <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;rovr&#39;</span><span class="p">,</span> <span class="n">beta_prior</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">smoothing</span> <span class="o">=</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">new_policy</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">X</span><span class="o">=</span><span class="n">Xexplore_sample</span><span class="p">,</span> <span class="n">a</span><span class="o">=</span><span class="n">actions_explore_sample</span><span class="p">,</span> <span class="n">r</span><span class="o">=</span><span class="n">rewards_explore_sample</span><span class="p">,</span> <span class="n">p</span><span class="o">=</span><span class="n">prob_actions_explore</span><span class="p">)</span>
+    <span class="n">mean_reward_dr_sm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">y</span><span class="p">[</span><span class="n">st_test</span><span class="p">:</span><span class="n">end_test</span><span class="p">,</span> <span class="p">:][</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="n">end_test</span> <span class="o">-</span> <span class="n">st_test</span><span class="p">),</span> <span class="n">new_policy</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">Xtest</span><span class="p">)])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Test set mean reward - Doubly-Robust Estimator + Smoothing: &quot;</span><span class="p">,</span> <span class="n">mean_reward_dr_sm</span><span class="p">)</span>
+
+
+    <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s1">&#39;Off-policy Learning Method&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Best - Constant&#39;</span><span class="p">,</span> <span class="s1">&#39;Naive&#39;</span><span class="p">,</span> <span class="s1">&#39;Naive + Prior&#39;</span><span class="p">,</span> <span class="s1">&#39;Naive + Smoothing&#39;</span><span class="p">,</span> <span class="s1">&#39;Doubly-Robust&#39;</span><span class="p">,</span>
+                                        <span class="s1">&#39;Doubly-Robust + Prior&#39;</span><span class="p">,</span> <span class="s1">&#39;Doubly-Robust + Smoothing&#39;</span><span class="p">,</span> <span class="s1">&#39;Offset Tree&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;Test set mean reward&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="n">mean_constant</span><span class="p">,</span> <span class="n">mean_reward_naive</span><span class="p">,</span> <span class="n">mean_reward_beta</span><span class="p">,</span> <span class="n">mean_reward_sm</span><span class="p">,</span> <span class="n">mean_reward_dr</span><span class="p">,</span>
+                                  <span class="n">mean_reward_dr_prior</span><span class="p">,</span> <span class="n">mean_reward_dr_sm</span><span class="p">,</span> <span class="n">mean_reward_ot</span><span class="p">]</span>
+    <span class="p">})</span>
+    <span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+    <span class="n">ylim</span><span class="p">(</span><span class="n">top</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">font_scale</span> <span class="o">=</span> <span class="mf">1.3</span><span class="p">)</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="s2">&quot;Off-policy Learning Method&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;Test set mean reward&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">results</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Off-policy Learning on CNAE-9 Dataset</span><span class="se">\n</span><span class="s1">Base Classifier is Logistic Regression&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+<span class="n">CMAB_explore</span><span class="p">(</span><span class="n">features</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Test set mean reward - Separate Classifiers:  0.11896551724137931
+Test set mean reward - Separate Classifiers + Prior:  0.3413793103448276
+Test set mean reward - Separate Classifiers + Smoothing:  0.11206896551724138
+Test set mean reward - Offset Tree technique:  0.9206896551724137
+Test set mean reward - Doubly-Robust Estimator:  0.8827586206896552
+Test set mean reward - Doubly-Robust Estimator + Prior:  0.8827586206896552
+Test set mean reward - Doubly-Robust Estimator + Smoothing:  0.8741379310344828
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/CNAE9_8_1.png" src="_images/CNAE9_8_1.png" />
+</div>
+</div>
+</section>
+<section id="Investigation-of-regular-MAB-algorithms">
+<h1>Investigation of regular MAB algorithms<a class="headerlink" href="#Investigation-of-regular-MAB-algorithms" title="Permalink to this heading">¶</a></h1>
+<section id="Random-selection-of-CNAE-9">
+<h2>Random selection of CNAE-9<a class="headerlink" href="#Random-selection-of-CNAE-9" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">random_selection</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Explores the viablity of random selection for this dataset</span>
+
+<span class="sd">    :param y: A numpy array of expected predictions</span>
+<span class="sd">    :type y: numpy array, required</span>
+
+<span class="sd">    :return: double that has the percentage of correct guesses</span>
+<span class="sd">    :rtype: double</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">selected</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">total_reward</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">rand_avgs</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">selection</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="n">selected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">selection</span><span class="p">)</span>
+        <span class="n">reward</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">selection</span><span class="p">]</span>
+        <span class="n">total_reward</span> <span class="o">+=</span> <span class="n">reward</span>
+        <span class="n">rand_average</span> <span class="o">=</span> <span class="n">total_reward</span><span class="o">/</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">rand_avgs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">rand_average</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">rand_avgs</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">random_selection</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.1259259259259259
+</pre></div></div>
+</div>
+</section>
+<section id="Epsilon-greedy">
+<h2>Epsilon greedy<a class="headerlink" href="#Epsilon-greedy" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">E_greedy</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Explores the viablity of epsilon greedy selection for this dataset</span>
+
+<span class="sd">    :param y: A numpy array of expected predictions</span>
+<span class="sd">    :type y: numpy array, required</span>
+
+<span class="sd">    :return: double that has the percentage of correct guesses</span>
+<span class="sd">    :rtype: double</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">selected</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">total_reward</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">eps</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="n">average</span> <span class="o">=</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">d</span>
+    <span class="n">counts</span> <span class="o">=</span>  <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">d</span>
+    <span class="n">rewards</span> <span class="o">=</span>  <span class="p">[]</span>
+
+    <span class="n">epsilon_average</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">p</span> <span class="o">&lt;</span> <span class="n">eps</span><span class="p">:</span>
+            <span class="n">selection</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">selection</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">([</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">average</span><span class="p">])</span>
+
+        <span class="n">reward</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">selection</span><span class="p">]</span>
+        <span class="n">total_reward</span> <span class="o">+=</span> <span class="n">reward</span>
+        <span class="n">rewards</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">reward</span><span class="p">)</span>
+        <span class="n">average</span><span class="p">[</span><span class="n">selection</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">average</span><span class="p">[</span><span class="n">selection</span><span class="p">]</span><span class="o">*</span><span class="n">counts</span><span class="p">[</span><span class="n">selection</span><span class="p">]</span> <span class="o">+</span> <span class="n">reward</span><span class="p">)</span><span class="o">/</span><span class="p">(</span><span class="n">counts</span><span class="p">[</span><span class="n">selection</span><span class="p">]</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="n">counts</span><span class="p">[</span><span class="n">selection</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="n">e_average</span> <span class="o">=</span> <span class="n">total_reward</span><span class="o">/</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">epsilon_average</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">e_average</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">epsilon_average</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+
+<span class="n">E_greedy</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.10740740740740741
+</pre></div></div>
+</div>
+</section>
+<section id="UCB">
+<h2>UCB<a class="headerlink" href="#UCB" title="Permalink to this heading">¶</a></h2>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">UCB</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Explores the viablity of UCB selection for this dataset</span>
+
+<span class="sd">    :param y: A numpy array of expected predictions</span>
+<span class="sd">    :type y: numpy array, required</span>
+
+<span class="sd">    :return: double that has the percentage of correct guesses</span>
+<span class="sd">    :rtype: double</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">N</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">d</span> <span class="o">=</span> <span class="n">y</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">selected</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">total_reward</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="n">UCB_averages</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="n">numbers_of_selections</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+    <span class="n">sums_of_reward</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">N</span><span class="p">):</span>
+        <span class="n">max_upper_bound</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">ad</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">d</span><span class="p">):</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">numbers_of_selections</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">average_reward</span> <span class="o">=</span> <span class="n">sums_of_reward</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">/</span> <span class="n">numbers_of_selections</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">delta_i</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">/</span> <span class="n">numbers_of_selections</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="n">upper_bound</span> <span class="o">=</span> <span class="n">average_reward</span> <span class="o">+</span> <span class="n">delta_i</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">upper_bound</span> <span class="o">=</span> <span class="mf">1e100</span>
+            <span class="k">if</span> <span class="n">upper_bound</span> <span class="o">&gt;</span> <span class="n">max_upper_bound</span><span class="p">:</span>
+                <span class="n">max_upper_bound</span> <span class="o">=</span> <span class="n">upper_bound</span>
+                <span class="n">selection</span> <span class="o">=</span> <span class="n">i</span>
+        <span class="n">selected</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">ad</span><span class="p">)</span>
+        <span class="n">numbers_of_selections</span><span class="p">[</span><span class="n">selection</span><span class="p">]</span> <span class="o">+=</span> <span class="mi">1</span>
+        <span class="n">reward</span> <span class="o">=</span> <span class="n">y</span><span class="p">[</span><span class="n">n</span><span class="p">][</span><span class="n">selection</span><span class="p">]</span>
+        <span class="n">sums_of_reward</span><span class="p">[</span><span class="n">selection</span><span class="p">]</span> <span class="o">+=</span> <span class="n">reward</span>
+        <span class="n">total_reward</span> <span class="o">+=</span> <span class="n">reward</span>
+        <span class="n">average</span> <span class="o">=</span> <span class="n">total_reward</span><span class="o">/</span><span class="p">(</span><span class="n">n</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
+        <span class="n">UCB_averages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">average</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">UCB_averages</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">UCB</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+0.12777777777777777
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">compare</span><span class="p">(</span><span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Compares the viablity of MAB algorithms on this data set</span>
+
+<span class="sd">    :param y: A numpy array of expected predictions</span>
+<span class="sd">    :type y: numpy array, required</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">12</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">80</span><span class="p">)</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+        <span class="s1">&#39;Learning Methods&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="s1">&#39;Random&#39;</span><span class="p">,</span> <span class="s1">&#39;epsilon&#39;</span><span class="p">,</span> <span class="s1">&#39;UCB&#39;</span><span class="p">],</span>
+        <span class="s1">&#39;Test set mean reward&#39;</span> <span class="p">:</span> <span class="p">[</span><span class="n">random_selection</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">E_greedy</span><span class="p">(</span><span class="n">y</span><span class="p">),</span> <span class="n">UCB</span><span class="p">(</span><span class="n">y</span><span class="p">)]</span>
+    <span class="p">})</span>
+
+    <span class="n">sns</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="n">font_scale</span> <span class="o">=</span> <span class="mf">1.3</span><span class="p">)</span>
+    <span class="n">sns</span><span class="o">.</span><span class="n">barplot</span><span class="p">(</span><span class="n">x</span> <span class="o">=</span> <span class="s2">&quot;Learning Methods&quot;</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s2">&quot;Test set mean reward&quot;</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">results</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Learning on CNAE-9 Dataset</span><span class="se">\n</span><span class="s1">no context&#39;</span><span class="p">)</span>
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+<span class="n">compare</span><span class="p">(</span><span class="n">y</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="_images/CNAE9_16_0.png" src="_images/CNAE9_16_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>
+</pre></div>
+</div>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">Applying Contextual Multi-Armed Bandits to improve self-adaptive MAPE-K loops</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Imports</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#Initial-data-processing">Initial data processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#Comparison-of-various-CMAB-algorithms">Comparison of various CMAB algorithms</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#Investigation-of-regular-MAB-algorithms">Investigation of regular MAB algorithms</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#Random-selection-of-CNAE-9">Random selection of CNAE-9</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#Epsilon-greedy">Epsilon greedy</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#UCB">UCB</a></li>
+</ul>
+</li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to Applying CMAB to improve MAPE-K loops’s documentation!</a></li>
+  </ul></li>
+</ul>
+</div>
+<div id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</div>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2022, Karan Shishoo.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 5.3.0</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.12</a>
+      
+      |
+      <a href="_sources/CNAE9.ipynb.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
