@@ -1,0 +1,7 @@
+pandas
+numpy
+sklearn
+contextualbandits
+matplotlib
+seaborn
+tqdm
