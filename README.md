@@ -12,4 +12,6 @@ The packages are as follows:
 - seaborn               | for data visulization
 - tqdm                  | for streamlining looped data streaming
 
-Once the packages have been installed in your virtual environment the script can be run by clciking on the ⏩  button.The code will execute cell by cell, first reading in the data from the provided dataset, scrambling the built data then testing the various CMAB algorithms on that data. After the CMAB algorithm testing the data is then also run on regular MAB algorithms to verify that contex did help the algorithms make better decisions
+Once the packages have been installed in your virtual environment the script can be run by clciking on the ⏩  button.The code will execute cell by cell, first reading in the data from the provided dataset, scrambling the built data then testing the various CMAB algorithms on that data. After the CMAB algorithm testing the data is then also run on regular MAB algorithms to verify that contex did help the algorithms make better decisions.
+
+The data currently considered in this case is CNAE-9 which is a publically avilable data set. More information on this data set is avialable in the datasets folder in the "CNAE-9.names" file.
